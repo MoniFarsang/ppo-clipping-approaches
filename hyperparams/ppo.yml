@@ -9,7 +9,9 @@ atari:
   batch_size: 256
   n_timesteps: !!float 1e7
   learning_rate: lin_2.5e-4
-  clip_range: lin_0.1
+  clip_range_function: 'lin'
+  clip_range_initialvalue: 0.1
+  clip_range_endvalue: 0.0
   vf_coef: 0.5
   ent_coef: 0.01
 
@@ -24,7 +26,9 @@ Pendulum-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: !!float 3e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 # Tuned
 CartPole-v1:
@@ -38,7 +42,9 @@ CartPole-v1:
   n_epochs: 20
   ent_coef: 0.0
   learning_rate: lin_0.001
-  clip_range: lin_0.2
+  clip_range_function: 'lin'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 MountainCar-v0:
   normalize: true
@@ -62,7 +68,9 @@ MountainCarContinuous-v0:
   gamma: 0.9999
   learning_rate: !!float 7.77e-05
   ent_coef: 0.00429
-  clip_range: 0.1
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.1
+  clip_range_endvalue: 0.0
   n_epochs: 10
   gae_lambda: 0.9
   max_grad_norm: 5
