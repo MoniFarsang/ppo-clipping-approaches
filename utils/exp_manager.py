@@ -12,6 +12,7 @@ import gym
 import numpy as np
 import optuna
 import yaml
+import stable_baselines3
 from optuna.integration.skopt import SkoptSampler
 from optuna.pruners import BasePruner, MedianPruner, SuccessiveHalvingPruner
 from optuna.samplers import BaseSampler, RandomSampler, TPESampler
@@ -252,10 +253,39 @@ class ExperimentManager(object):
 
         return hyperparams, saved_hyperparams
 
+    def exponential_schedule(initial_value):
+    """
+    Linear learning rate schedule.
+    :param initial_value: (float or str)
+    :return: (function)
+    """
+    if isinstance(initial_value, str):
+        initial_value = float(initial_value)
+
+    def func(progress):
+        """
+        Progress will decrease from 1 (beginning) to 0
+        :param progress: (float)
+        :return: (float)
+        """
+        
+        return max(0.99**((1-progress)*100) * initial_value,0.1)
+
+    return func
+
     @staticmethod
     def _preprocess_schedules(hyperparams: Dict[str, Any]) -> Dict[str, Any]:
         # Create schedules
-        for key in ["learning_rate", "clip_range", "clip_range_vf"]:
+        for key in ["clip_range_function"]:
+            if key not in hyperparams:
+                continue
+            if hyperparams["clip_range_function"]=='const':
+                hyperparams["clip_range"]=constant_fn(float(hyperparams["clip_range_initialvalue"]))
+            elif hyperparams["clip_range_function"]=='lin':
+                hyperparams["clip_range"]=linear_schedule(float(hyperparams["clip_range_initialvalue"]))    
+            elif hyperparams["clip_range_function"]=='exp':
+                hyperparams["clip_range"]=exponential_schedule(float(hyperparams["clip_range_initialvalue"]))
+        for key in ["learning_rate", "clip_range_vf"]:
             if key not in hyperparams:
                 continue
             if isinstance(hyperparams[key], str):
