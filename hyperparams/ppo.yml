@@ -149,7 +149,7 @@ HalfCheetahBulletEnv-v0:
   vf_coef: 0.5
   learning_rate: !!float 3e-5
   use_sde: True
-  clip_range_function: lin
+  clip_range_function: 'const'
   clip_range_initialvalue: 0.4
   policy_kwargs: "dict(log_std_init=-2,
                        ortho_init=False,
