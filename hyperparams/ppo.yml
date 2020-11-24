@@ -151,6 +151,7 @@ HalfCheetahBulletEnv-v0:
   use_sde: True
   clip_range_function: 'const'
   clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
   policy_kwargs: "dict(log_std_init=-2,
                        ortho_init=False,
                        activation_fn=nn.ReLU,
@@ -175,7 +176,9 @@ AntBulletEnv-v0:
   vf_coef: 0.5
   learning_rate: !!float 3e-5
   use_sde: True
-  clip_range: 0.4
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
   policy_kwargs: "dict(log_std_init=-1,
                        ortho_init=False,
                        activation_fn=nn.ReLU,
@@ -200,7 +203,9 @@ Walker2DBulletEnv-v0:
   vf_coef: 0.5
   learning_rate: !!float 3e-5
   use_sde: True
-  clip_range: lin_0.4
+  clip_range_function: 'lin'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
   policy_kwargs: "dict(log_std_init=-2,
                        ortho_init=False,
                        activation_fn=nn.ReLU,
@@ -225,7 +230,9 @@ HopperBulletEnv-v0:
   vf_coef: 0.5
   learning_rate: !!float 3e-5
   use_sde: True
-  clip_range: lin_0.4
+  clip_range_function: 'lin'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
   policy_kwargs: "dict(log_std_init=-2,
                        ortho_init=False,
                        activation_fn=nn.ReLU,
@@ -250,7 +257,9 @@ ReacherBulletEnv-v0:
   vf_coef: 0.5
   learning_rate: !!float 3e-5
   use_sde: True
-  clip_range: lin_0.4
+  clip_range_function: 'lin'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
   policy_kwargs: "dict(log_std_init=-2.7,
                        ortho_init=False,
                        activation_fn=nn.ReLU,
@@ -269,7 +278,9 @@ MinitaurBulletEnv-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: 2.5e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
 
 MinitaurBulletDuckEnv-v0:
   normalize: true
@@ -283,7 +294,9 @@ MinitaurBulletDuckEnv-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: 2.5e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 # To be tuned
 HumanoidBulletEnv-v0:
@@ -298,7 +311,9 @@ HumanoidBulletEnv-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: 2.5e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 InvertedDoublePendulumBulletEnv-v0:
   normalize: true
@@ -312,7 +327,9 @@ InvertedDoublePendulumBulletEnv-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: 2.5e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 InvertedPendulumSwingupBulletEnv-v0:
   normalize: true
@@ -326,7 +343,9 @@ InvertedPendulumSwingupBulletEnv-v0:
   n_epochs: 10
   ent_coef: 0.0
   learning_rate: 2.5e-4
-  clip_range: 0.2
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.2
+  clip_range_endvalue: 0.0
 
 # Following https://github.com/lcswillems/rl-starter-files
 MiniGrid-DoorKey-5x5-v0:

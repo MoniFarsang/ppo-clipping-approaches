@@ -66,6 +66,7 @@ class ExperimentManager(object):
         n_jobs: int = 1,
         sampler: str = "tpe",
         pruner: str = "median",
+        schedule: str = "const",
         n_startup_trials: int = 0,
         n_evaluations: int = 1,
         truncate_last_trajectory: bool = False,
@@ -74,7 +75,7 @@ class ExperimentManager(object):
         log_interval: int = 0,
         save_replay_buffer: bool = False,
         verbose: int = 1,
-        vec_env_type: str = "dummy",
+        vec_env_type: str = "dummy"
     ):
         super(ExperimentManager, self).__init__()
         self.algo = algo
@@ -137,6 +138,9 @@ class ExperimentManager(object):
         )
         self.params_path = f"{self.save_path}/{self.env_id}"
 
+        # Schedule
+        self.schedule = schedule
+
     def setup_experiment(self) -> Optional[BaseAlgorithm]:
         """
         Read hyperparameters, pre-process them (create schedules, wrappers, callbacks, action noise objects)
@@ -145,6 +149,10 @@ class ExperimentManager(object):
         :return: the initialized RL model
         """
         hyperparams, saved_hyperparams = self.read_hyperparameters()
+
+        if "clip_range_function" in hyperparams:
+            hyperparams["clip_range_function"]=self.schedule 
+
         hyperparams, self.env_wrapper, self.callbacks = self._preprocess_hyperparams(hyperparams)
 
         self.create_log_folder()
@@ -253,10 +261,11 @@ class ExperimentManager(object):
 
         return hyperparams, saved_hyperparams
 
-    def exponential_schedule(initial_value):
+    def exponential_schedule_clip(initial_value, end_value):
         """
-        Linear learning rate schedule.
-        :param initial_value: (float or str)
+        Exponential cliprange schedule.
+        :param initial_value: (float)
+        :param end_value: (float)
         :return: (function)
         """
         if isinstance(initial_value, str):
@@ -269,25 +278,34 @@ class ExperimentManager(object):
             :return: (float)
             """
             
-            return max(0.99**((1-progress)*100) * initial_value,0.1)
+            return max(0.99**((1-progress)*100) * initial_value, end_value)
+
+        return func
+    
+    def linear_schedule_clip(initial_value, end_value):
+        """
+        Linear cliprange schedule.
+        :param initial_value: (float)
+        :param end_value: (float)
+        :return: (function)
+        """
+        if isinstance(initial_value, str):
+            initial_value = float(initial_value)
+
+        def func(progress):
+            """
+            Progress will decrease from 1 (beginning) to 0
+            :param progress: (float)
+            :return: (float)
+            """
+            return max(progress * initial_value, end_value)
 
         return func
 
     @staticmethod
     def _preprocess_schedules(hyperparams: Dict[str, Any]) -> Dict[str, Any]:
         # Create schedules
-        for key in ["clip_range_function"]:
-            if key not in hyperparams:
-                continue
-            if hyperparams["clip_range_function"]=='const':
-                hyperparams["clip_range"]=constant_fn(float(hyperparams["clip_range_initialvalue"]))
-            elif hyperparams["clip_range_function"]=='lin':
-                hyperparams["clip_range"]=linear_schedule(float(hyperparams["clip_range_initialvalue"]))    
-            elif hyperparams["clip_range_function"]=='exp':
-                hyperparams["clip_range"]=exponential_schedule(float(hyperparams["clip_range_initialvalue"]))
-            del hyperparams["clip_range_function"]
-            del hyperparams["clip_range_initialvalue"]
-        for key in ["learning_rate", "clip_range_vf"]:
+        for key in ["learning_rate", "clip_range", "clip_range_vf"]:
             if key not in hyperparams:
                 continue
             if isinstance(hyperparams[key], str):
@@ -301,6 +319,17 @@ class ExperimentManager(object):
                 hyperparams[key] = constant_fn(float(hyperparams[key]))
             else:
                 raise ValueError(f"Invalid value for {key}: {hyperparams[key]}")
+
+        if "clip_range_function" in hyperparams:
+            if hyperparams["clip_range_function"]=='const':
+                hyperparams["clip_range"]=constant_fn(float(hyperparams["clip_range_initialvalue"]))
+            elif hyperparams["clip_range_function"]=='lin':
+                hyperparams["clip_range"]=linear_schedule_clip(float(hyperparams["clip_range_initialvalue"]),float(hyperparams["clip_range_endvalue"]))    
+            elif hyperparams["clip_range_function"]=='exp':
+                hyperparams["clip_range"]=exponential_schedule_clip(float(hyperparams["clip_range_initialvalue"]),float(hyperparams["clip_range_endvalue"]))
+            del hyperparams["clip_range_function"]
+            del hyperparams["clip_range_initialvalue"]
+            del hyperparams["clip_range_endvalue"]
         return hyperparams
 
     def _preprocess_normalization(self, hyperparams: Dict[str, Any]) -> Dict[str, Any]:
