@@ -254,24 +254,24 @@ class ExperimentManager(object):
         return hyperparams, saved_hyperparams
 
     def exponential_schedule(initial_value):
-    """
-    Linear learning rate schedule.
-    :param initial_value: (float or str)
-    :return: (function)
-    """
-    if isinstance(initial_value, str):
-        initial_value = float(initial_value)
-
-    def func(progress):
         """
-        Progress will decrease from 1 (beginning) to 0
-        :param progress: (float)
-        :return: (float)
+        Linear learning rate schedule.
+        :param initial_value: (float or str)
+        :return: (function)
         """
-        
-        return max(0.99**((1-progress)*100) * initial_value,0.1)
+        if isinstance(initial_value, str):
+            initial_value = float(initial_value)
 
-    return func
+        def func(progress):
+            """
+            Progress will decrease from 1 (beginning) to 0
+            :param progress: (float)
+            :return: (float)
+            """
+            
+            return max(0.99**((1-progress)*100) * initial_value,0.1)
+
+        return func
 
     @staticmethod
     def _preprocess_schedules(hyperparams: Dict[str, Any]) -> Dict[str, Any]:
@@ -285,6 +285,8 @@ class ExperimentManager(object):
                 hyperparams["clip_range"]=linear_schedule(float(hyperparams["clip_range_initialvalue"]))    
             elif hyperparams["clip_range_function"]=='exp':
                 hyperparams["clip_range"]=exponential_schedule(float(hyperparams["clip_range_initialvalue"]))
+            del hyperparams["clip_range_function"]
+            del hyperparams["clip_range_initialvalue"]
         for key in ["learning_rate", "clip_range_vf"]:
             if key not in hyperparams:
                 continue
