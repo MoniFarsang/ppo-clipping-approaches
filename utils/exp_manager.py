@@ -24,6 +24,7 @@ from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckA
 from stable_baselines3.common.preprocessing import is_image_space
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.utils import constant_fn
+from utils.utils import linear_schedule_clip, exponential_schedule_clip
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize, VecTransposeImage
 from stable_baselines3.common.vec_env.obs_dict_wrapper import ObsDictWrapper
 
@@ -261,46 +262,7 @@ class ExperimentManager(object):
 
         return hyperparams, saved_hyperparams
 
-    def exponential_schedule_clip(initial_value, end_value):
-        """
-        Exponential cliprange schedule.
-        :param initial_value: (float)
-        :param end_value: (float)
-        :return: (function)
-        """
-        if isinstance(initial_value, str):
-            initial_value = float(initial_value)
-
-        def func(progress):
-            """
-            Progress will decrease from 1 (beginning) to 0
-            :param progress: (float)
-            :return: (float)
-            """
-            
-            return max(0.99**((1-progress)*100) * initial_value, end_value)
-
-        return func
     
-    def linear_schedule_clip(initial_value, end_value):
-        """
-        Linear cliprange schedule.
-        :param initial_value: (float)
-        :param end_value: (float)
-        :return: (function)
-        """
-        if isinstance(initial_value, str):
-            initial_value = float(initial_value)
-
-        def func(progress):
-            """
-            Progress will decrease from 1 (beginning) to 0
-            :param progress: (float)
-            :return: (float)
-            """
-            return max(progress * initial_value, end_value)
-
-        return func
 
     @staticmethod
     def _preprocess_schedules(hyperparams: Dict[str, Any]) -> Dict[str, Any]:

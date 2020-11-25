@@ -265,6 +265,46 @@ def linear_schedule(initial_value: Union[float, str]) -> Callable[[float], float
 
     return func
 
+def exponential_schedule_clip(initial_value, end_value):
+    """
+    Exponential cliprange schedule.
+    :param initial_value: (float)
+    :param end_value: (float)
+    :return: (function)
+    """
+    if isinstance(initial_value, str):
+        initial_value = float(initial_value)
+
+    def func(progress):
+        """
+        Progress will decrease from 1 (beginning) to 0
+        :param progress: (float)
+        :return: (float)
+        """
+        
+        return max(0.99**((1-progress)*100) * initial_value, end_value)
+
+    return func
+    
+def linear_schedule_clip(initial_value, end_value):
+    """
+    Linear cliprange schedule.
+    :param initial_value: (float)
+    :param end_value: (float)
+    :return: (function)
+    """
+    if isinstance(initial_value, str):
+        initial_value = float(initial_value)
+
+    def func(progress):
+        """
+        Progress will decrease from 1 (beginning) to 0
+        :param progress: (float)
+        :return: (float)
+        """
+        return max(progress * initial_value, end_value)
+
+    return func
 
 def get_trained_models(log_folder: str) -> Dict[str, Tuple[str, str]]:
     """
