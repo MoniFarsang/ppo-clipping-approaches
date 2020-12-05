@@ -88,6 +88,9 @@ Acrobot-v1:
   gamma: 0.99
   n_epochs: 4
   ent_coef: 0.0
+  clip_range_function: 'const' #default
+  clip_range_initialvalue: 0.2 #default
+  clip_range_endvalue: 0.0
 
 BipedalWalker-v3:
   normalize: true
