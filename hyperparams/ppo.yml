@@ -169,6 +169,28 @@ HalfCheetahBulletEnv-v0:
                        net_arch=[dict(pi=[256, 256], vf=[256, 256])]
                        )"
 
+
+HalfCheetah-v3:
+  env_wrapper: utils.wrappers.TimeFeatureWrapper
+  normalize: true
+  n_envs: 16
+  n_timesteps: !!float 2e6
+  policy: 'MlpPolicy'
+  batch_size: 128
+  n_steps: 512
+  gamma: 0.99
+  gae_lambda: 0.9
+  n_epochs: 20
+  ent_coef: 0.0
+  sde_sample_freq: 4
+  max_grad_norm: 0.5
+  vf_coef: 0.5
+  learning_rate: !!float 3e-5
+  use_sde: True
+  clip_range_function: 'const'
+  clip_range_initialvalue: 0.4
+  clip_range_endvalue: 0.0
+
 # Tuned
 AntBulletEnv-v0:
   env_wrapper: utils.wrappers.TimeFeatureWrapper
@@ -201,7 +223,7 @@ Walker2DBulletEnv-v0:
   env_wrapper: utils.wrappers.TimeFeatureWrapper
   normalize: true
   n_envs: 16
-  n_timesteps: !!float 2e6
+  n_timesteps: !!float 1e6 #2e6
   policy: 'MlpPolicy'
   batch_size: 128
   n_steps: 512
@@ -228,7 +250,7 @@ HopperBulletEnv-v0:
   env_wrapper: utils.wrappers.TimeFeatureWrapper
   normalize: true
   n_envs: 16
-  n_timesteps: !!float 2e6
+  n_timesteps: !!float 1e6 #2e6
   policy: 'MlpPolicy'
   batch_size: 128
   n_steps: 512
@@ -313,7 +335,7 @@ MinitaurBulletDuckEnv-v0:
 HumanoidBulletEnv-v0:
   normalize: true
   n_envs: 8
-  n_timesteps: !!float 1e7
+  n_timesteps: !!float 1e6 #1e7
   policy: 'MlpPolicy'
   n_steps: 2048
   batch_size: 64
@@ -329,7 +351,7 @@ HumanoidBulletEnv-v0:
 InvertedDoublePendulumBulletEnv-v0:
   normalize: true
   n_envs: 8
-  n_timesteps: !!float 2e6
+  n_timesteps: !!float 1e6 #2e6
   policy: 'MlpPolicy'
   n_steps: 2048
   batch_size: 64
