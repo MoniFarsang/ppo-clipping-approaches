@@ -181,8 +181,8 @@ class PPO(OnPolicyAlgorithm):
                 print(f"Epoch {epoch} number of clipped elements: {number_diff}")
                 print(number_diff)
                 policy_loss_min = th.min(policy_loss_1, policy_loss_2)
-                #policy_loss_min_mean = policy_loss_min.mean()
-                policy_loss_min_mean = policy_loss_min.median()
+                policy_loss_min_mean = policy_loss_min.mean()
+                #policy_loss_min_mean = policy_loss_min.median()
                 policy_loss = -policy_loss_min_mean
 
                 plt.plot(policy_loss_1.cpu().detach().numpy(), 'bo')
