@@ -176,7 +176,7 @@ class PPO(OnPolicyAlgorithm):
                 # ratio between old and new policy, should be one at the first iteration
                 ratio = th.exp(log_prob - rollout_data.old_log_prob)
 
-                ratio_new = th.log(th.exp(log_prob)/ th.exp(rollout_data.old_log_prob)) 
+                ratio_new = log_prob/rollout_data.old_log_prob 
                 # clipped surrogate loss
                 if (th.mean(advantages) > 0 and th.mean(ratio) > 1+clip_range):
                     policy_loss_min = lambda_par * (1+ clip_range)*th.log(ratio_new)
