@@ -60,7 +60,7 @@ MountainCar-v0:
 # Tuned
 MountainCarContinuous-v0:
   normalize: true
-  n_envs: 1
+  n_envs: 8
   n_timesteps: !!float 20000
   policy: 'MlpPolicy'
   batch_size: 256
