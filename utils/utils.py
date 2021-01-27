@@ -10,7 +10,7 @@ import torch as th  # noqa: F401
 import yaml
 
 from utils.PPO_modified import PPO
-from utils.PPO_adaptive import PPO as PPO_lamdba
+from utils.PPO_adaptive import PPO as PPO_lambda
 from stable_baselines3 import A2C, DDPG, DQN, HER, SAC, TD3
 from stable_baselines import TRPO
 from stable_baselines3.common.callbacks import BaseCallback
@@ -31,7 +31,7 @@ ALGOS = {
     "ddpg": DDPG,
     "dqn": DQN,
     "ppo": PPO,
-    "ppo2": PPO_lamdba,
+    "ppo2": PPO_lambda,
     "her": HER,
     "sac": SAC,
     "td3": TD3

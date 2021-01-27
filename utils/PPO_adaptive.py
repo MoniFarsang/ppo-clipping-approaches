@@ -113,7 +113,8 @@ class PPO(OnPolicyAlgorithm):
         self.batch_size = batch_size
         self.n_epochs = n_epochs
         self.clip_range = clip_range
-        self.lambda_par0= 0.9
+        self.lr = 0.9
+        self.lambda_par0= 0.3
         self.lambda_par = self.lambda_par0
         self.original_clip_range = 0.2
         self.clip_range_vf = clip_range_vf
@@ -127,6 +128,7 @@ class PPO(OnPolicyAlgorithm):
 
         # Initialize schedules for policy/value clipping
         self.clip_range = get_schedule_fn(self.clip_range)
+        self.lr = get_schedule_fn(self.lr)
         if self.clip_range_vf is not None:
             if isinstance(self.clip_range_vf, (float, int)):
                 assert self.clip_range_vf > 0, "`clip_range_vf` must be positive, " "pass `None` to deactivate vf clipping"
@@ -176,14 +178,15 @@ class PPO(OnPolicyAlgorithm):
                 # ratio between old and new policy, should be one at the first iteration
                 ratio = th.exp(log_prob - rollout_data.old_log_prob)
 
-                ratio_new = log_prob - rollout_data.old_log_prob 
+                ratio_new = th.abs(log_prob) - (th.abs(rollout_data.old_log_prob) + advantages/lambda_par)
                 # clipped surrogate loss
                 if (th.mean(advantages) > 0 and th.mean(ratio) > 1+clip_range):
-                    policy_loss_min = lambda_par * (1+ clip_range)*th.log(ratio_new)
+                    policy_loss_min = lambda_par * (1+ clip_range)*ratio_new
                 elif (th.mean(advantages) < 0 and th.mean(ratio) < 1-clip_range):
-                    policy_loss_min = lambda_par * (1+ clip_range)*th.log(ratio_new)
+                    policy_loss_min = lambda_par * (1- clip_range)*ratio_new
                 else:
-                    policy_loss_min = lambda_par * ratio * th.log(ratio_new)
+                    policy_loss_min = lambda_par * ratio * ratio_new
+
                 # policy_loss_1 = advantages * ratio
                 
                 # policy_loss_2 = advantages * th.clamp(ratio, 1 - clip_range, 1 + clip_range)
@@ -194,7 +197,7 @@ class PPO(OnPolicyAlgorithm):
                 # print(number_diff)
                 # policy_loss_min = th.min(policy_loss_1, policy_loss_2)
                 #policy_loss_min_mean = policy_loss_min.mean()
-                policy_loss_min_mean = policy_loss_min.median()
+                policy_loss_min_mean = policy_loss_min.mean()
                 policy_loss = -policy_loss_min_mean
 
                 # plt.plot(policy_loss_1.cpu().detach().numpy(), 'bo')
@@ -228,7 +231,7 @@ class PPO(OnPolicyAlgorithm):
 
                 entropy_losses.append(entropy_loss.item())
 
-                loss = policy_loss + self.ent_coef * entropy_loss + self.vf_coef * value_loss
+                loss = lambda_par * policy_loss + self.ent_coef * entropy_loss + self.vf_coef * value_loss
 
                 # Optimization step
                 self.policy.optimizer.zero_grad()
