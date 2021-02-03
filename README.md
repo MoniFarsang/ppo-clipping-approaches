@@ -19,14 +19,14 @@ PyBullet:
 
 ## Enjoy the trained  PPO agent
 
-The trained agents are added to the repo. If the trained agent exists, then you can see it in action using:
+The trained agents are added to the repo. The exp-id refers to the different clipping strategies (1: constant, 2: linearly decaying, 3: exponentially decaying). If the trained agent exists, then you can see it in action using:
 ```
-python enjoy.py --algo ppo --env env_id -f logs/ --exp-id 0
+python enjoy.py --algo ppo --env env_id --exp-id number
 ```
 
-For example, enjoy PPO on CartPole during 5000 timesteps:
+For example, enjoy PPO with linearly decaying clipping range on CartPole during 5000 timesteps:
 ```
-python enjoy.py --algo ppo --env CartPole-v1 -f logs/ --exp-id 0 -n 5000
+python enjoy.py --algo ppo --env CartPole-v1 --exp-id 2 -n 5000
 ```
 
 ## Train the PPO agent
